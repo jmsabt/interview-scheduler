@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import CsvImport from "./CsvImport"; // Assuming CsvImport.jsx is in the same directory
+import CsvExport from "./CsvExport"; // Import the CsvExport component
 
 const App = () => {
   // State management
@@ -708,13 +709,23 @@ const App = () => {
                   <Calendar size={24} />
                   Interview Schedule
                 </h2>
-                <button
-                  onClick={clearSchedule}
-                  className="flex items-center gap-2 px-4 py-2 text-blue-200 hover:text-blue-100 hover:bg-blue-500/20 rounded-lg transition-all"
-                >
-                  <RotateCcw size={16} />
-                  Clear Schedule
-                </button>
+                <div className="flex gap-2">
+                  {" "}
+                  {/* Grouping buttons */}
+                  <CsvExport
+                    matches={matches}
+                    unmatched={unmatched}
+                    scheduleCapacity={scheduleCapacity}
+                    scheduleDuration={scheduleDuration} // Pass scheduleDuration here
+                  />
+                  <button
+                    onClick={clearSchedule}
+                    className="flex items-center gap-2 px-4 py-2 text-blue-200 hover:text-blue-100 hover:bg-blue-500/20 rounded-lg transition-all"
+                  >
+                    <RotateCcw size={16} />
+                    Clear Schedule
+                  </button>
+                </div>
               </div>
 
               {/* Duration and Capacity Controls */}
