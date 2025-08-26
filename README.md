@@ -1,4 +1,3 @@
-````markdown
 # Interview Scheduler App 🗓️
 
 A React-based web application designed to simplify the process of scheduling interviews between an interviewer and multiple job applicants. It helps you manage interviewer availability, add applicant details, find common time slots, and generate a clear interview schedule.
@@ -75,7 +74,6 @@ npm install
 # or
 yarn install
 ```
-````
 
 ### Run
 
