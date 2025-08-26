@@ -1,70 +1,179 @@
-# Getting Started with Create React App
+Interview Scheduler App 🗓️
+This is a React-based web application designed to simplify the process of scheduling interviews between an interviewer and multiple job applicants. It helps you manage interviewer availability, add applicant details, find common time slots, and generate a clear interview schedule. Data persists locally, and you can easily import applicants from a CSV file and export the final schedule.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+✨ Features
+Interviewer Availability Setup: Define the interviewer's weekly working hours (Monday to Friday) with multiple time slots per day.
 
-## Available Scripts
+Applicant Management:
 
-In the project directory, you can run:
+Manually add new applicants with their names and individual weekly availability.
 
-### `npm start`
+Edit existing applicant details and availability.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Delete individual applicants.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Clear all applicants at once.
 
-### `npm test`
+Import Applicants from CSV: Upload a CSV file to quickly add multiple applicants, including their names and detailed availability across the week.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Automatic Schedule Generation: Based on interviewer and applicant availability, the app automatically generates an optimal interview schedule.
 
-### `npm run build`
+Configurable Schedule Parameters: Adjust the interview duration (e.g., 15, 30, 45, 60 minutes) and the number of interviewers available (e.g., 1 or 2) to regenerate the schedule dynamically.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Schedule Results View:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Displays matched applicants in organized time slots per day.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Lists any applicants who could not be matched due to conflicting availability.
 
-### `npm run eject`
+Data Persistence: All interviewer availability and applicant data are automatically saved to your browser's local storage, so your information remains even after you refresh or close the tab.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Clear All Data: A dedicated button to completely reset all saved data (interviewer, applicants, and schedule) from local storage.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Export Schedule to CSV: Download the generated interview schedule as a CSV file for easy sharing or record-keeping. The export includes all time slots and assigned applicants, as well as a list of unmatched applicants.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+🛠️ Technologies Used
+React: For building the user interface.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Tailwind CSS: For utility-first styling and responsive design.
 
-## Learn More
+Lucide React: For beautiful, customizable icons.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+🚀 Getting Started
+Follow these instructions to get a copy of the project up and running on your local machine.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Prerequisites
+Node.js (LTS version recommended)
 
-### Code Splitting
+npm or Yarn
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Installation
+Clone the repository (or download the code files):
 
-### Analyzing the Bundle Size
+git clone <your-repository-url>
+cd interview-scheduler-app
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+(If you just copied the files, make sure App.jsx, CsvImport.jsx, and CsvExport.jsx are in the same src directory.)
 
-### Making a Progressive Web App
+Install dependencies:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+npm install
 
-### Advanced Configuration
+# or
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+yarn install
 
-### Deployment
+Run the application:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+npm start
 
-### `npm run build` fails to minify
+# or
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+yarn start
+
+This will open the application in your browser at http://localhost:3000 (or another available port).
+
+💡 Usage
+The application is divided into three main views for a streamlined workflow:
+
+1. Interviewer Setup
+   Navigate to the "Interviewer Setup" tab.
+
+For each day (Monday - Friday), click "Add Time" to define the interviewer's available time blocks.
+
+Use the dropdowns to set start and end times for each slot (e.g., "9:00 AM" to "12:00 PM").
+
+You can add multiple non-contiguous time slots for a single day.
+
+2. Manage Applicants
+   Navigate to the "Manage Applicants" tab.
+
+Adding Applicants Manually:
+In the "Add New Applicant" section, enter the Applicant Name.
+
+For each day, use the "Add Time" button to specify their individual availability, similar to how you set interviewer availability.
+
+Click "Add Applicant" to save.
+
+Importing Applicants from CSV:
+Look for the "Import Applicants from CSV" section.
+
+Your CSV file should have the following header row:
+Applicant Name,Monday,Tuesday,Wednesday,Thursday,Friday
+
+For data rows:
+
+Applicant Name: Enter the applicant's name.
+
+Day Columns: Enter time ranges in 24-hour format (HH:MM).
+
+Example: 09:00-12:00 (9 AM to 12 PM)
+
+For multiple slots on one day, separate them with a semicolon (;): 09:00-12:00;14:00-17:00
+
+Leave a cell empty if the applicant is not available on that day.
+
+Example CSV Content:
+
+Applicant Name,Monday,Tuesday,Wednesday,Thursday,Friday
+Alice Smith,09:00-12:00;14:00-17:00,10:00-13:00,,08:00-10:00,13:00-16:00
+Bob Johnson,,09:00-17:00,11:00-15:00,,,10:00-12:00;14:00-16:00
+
+Click "Select CSV File" and choose your file.
+
+Click "Process CSV" to add the applicants to your list.
+
+Editing and Deleting Applicants:
+In the "Added Applicants" list, use the pencil icon to edit an applicant's details.
+
+Use the trash icon to delete an applicant.
+
+Click "Clear All" to remove all applicants from the list.
+
+Generating the Schedule:
+Once you have added applicants, click the "Generate Schedule Matches" button in the "Manage Applicants" section. This will take you to the "Schedule Results" view.
+
+3. Schedule Results
+   Navigate to the "Schedule Results" tab (or arrive here after generating a schedule).
+
+Interview Duration: Adjust the desired length of each interview (e.g., 15, 30, 45, or 60 minutes). The schedule will automatically re-calculate.
+
+Number of Interviewers Available: Select if you have 1 or 2 interviewers. The schedule will adapt to this capacity.
+
+Matched Schedule: View the generated schedule, showing specific time slots for each day and the applicant(s) assigned to them. All times are displayed in AM/PM format.
+
+Unmatched Applicants: If any applicants could not be scheduled, they will be listed here.
+
+Clear Schedule: Click this button to clear only the generated schedule results (not the interviewer or applicant data).
+
+Exporting the Schedule to CSV:
+Click the "Export Schedule to CSV" button.
+
+A file named interview_schedule.csv will be downloaded to your computer.
+
+The CSV will be structured with "Start Time", "End Time", and then days as columns. Applicant names will populate the cells. All times in the CSV will be in AM/PM format.
+
+🗑️ Clearing All Data
+At any time, you can click the "Clear All Data" button in the top-right corner of the header.
+
+This will reset all interviewer availability, applicant data, and the current schedule, effectively starting the application from scratch.
+
+🛠️ File Structure
+App.jsx: The main component that manages application state, views, and core scheduling logic.
+
+CsvImport.jsx: A component responsible for handling CSV file uploads, parsing applicant data, and passing it to App.jsx.
+
+CsvExport.jsx: A component responsible for formatting the generated schedule and unmatched applicants into a CSV string and triggering a download.
+
+🚀 Future Enhancements
+Conflict Resolution: Implement a feature to help resolve scheduling conflicts for unmatched applicants.
+
+Prioritization: Allow setting priority levels for applicants.
+
+Multiple Interviewers: Support adding multiple interviewers with their distinct availabilities.
+
+Date Range: Expand beyond a fixed weekly schedule to a specific date range.
+
+Calendar Integration: Integrate with external calendar services (e.g., Google Calendar) for seamless event creation.
+
+Better Error Reporting: Enhance user feedback for invalid CSV data.
