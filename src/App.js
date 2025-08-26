@@ -8,7 +8,10 @@ import {
   UserCheck,
   Edit3,
   RotateCcw,
+  RefreshCcw, // Added for clear all data button
 } from "lucide-react";
+
+import CsvImport from "./CsvImport"; // Assuming CsvImport.jsx is in the same directory
 
 const App = () => {
   // State management
@@ -26,7 +29,7 @@ const App = () => {
   const [matches, setMatches] = useState([]);
   const [unmatched, setUnmatched] = useState([]);
   const [scheduleCapacity, setScheduleCapacity] = useState(1);
-  const [scheduleDuration, setScheduleDuration] = useState(15); // Moved here for results view
+  const [scheduleDuration, setScheduleDuration] = useState(15);
   const [editingApplicant, setEditingApplicant] = useState(null);
 
   const [currentApplicant, setCurrentApplicant] = useState({
@@ -53,6 +56,24 @@ const App = () => {
     applicants: "interview_scheduler_applicants",
   };
 
+  // Handle applicants imported from CSV
+  const handleCsvImport = (importedApplicants) => {
+    // Filter out duplicates if an applicant with the same name already exists
+    const uniqueNewApplicants = importedApplicants.filter(
+      (newApp) =>
+        !applicants.some((existingApp) => existingApp.name === newApp.name)
+    );
+    setApplicants((prev) => [...prev, ...uniqueNewApplicants]);
+    // You might want to provide a message to the user about duplicates if any
+    if (uniqueNewApplicants.length < importedApplicants.length) {
+      console.warn(
+        "Some applicants from CSV were duplicates and were not added."
+      );
+    }
+  };
+
+  // --- LOCAL STORAGE EFFECTS ---
+
   // Load data from localStorage on component mount
   useEffect(() => {
     const savedInterviewer = localStorage.getItem(STORAGE_KEYS.interviewer);
@@ -62,7 +83,7 @@ const App = () => {
       try {
         setInterviewerData(JSON.parse(savedInterviewer));
       } catch (e) {
-        console.error("Failed to parse interviewer data:", e);
+        console.error("Failed to parse interviewer data from localStorage:", e);
       }
     }
 
@@ -70,12 +91,12 @@ const App = () => {
       try {
         setApplicants(JSON.parse(savedApplicants));
       } catch (e) {
-        console.error("Failed to parse applicants data:", e);
+        console.error("Failed to parse applicants data from localStorage:", e);
       }
     }
   }, []);
 
-  // Save interviewer data to localStorage
+  // Save interviewer data to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEYS.interviewer,
@@ -83,12 +104,14 @@ const App = () => {
     );
   }, [interviewerData]);
 
-  // Save applicants data to localStorage
+  // Save applicants data to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.applicants, JSON.stringify(applicants));
   }, [applicants]);
 
-  // Time slot component
+  // --- UTILITY COMPONENTS AND FUNCTIONS ---
+
+  // Time slot input component for setting availability
   const TimeSlotInput = ({ day, slots, onSlotsChange }) => {
     const addSlot = () => {
       onSlotsChange(day, [...slots, { start: "09:00", end: "09:30" }]);
@@ -180,7 +203,7 @@ const App = () => {
     );
   };
 
-  // Handle availability changes
+  // Handle interviewer availability changes
   const handleInterviewerAvailabilityChange = (day, slots) => {
     setInterviewerData((prev) => ({
       ...prev,
@@ -191,6 +214,7 @@ const App = () => {
     }));
   };
 
+  // Handle applicant availability changes (for add/edit forms)
   const handleApplicantAvailabilityChange = (day, slots) => {
     if (editingApplicant) {
       setEditingApplicant((prev) => ({
@@ -211,7 +235,7 @@ const App = () => {
     }
   };
 
-  // Add applicant
+  // Add a new applicant
   const addApplicant = () => {
     if (!currentApplicant.name.trim()) return;
 
@@ -228,12 +252,12 @@ const App = () => {
     });
   };
 
-  // Start editing applicant
+  // Set applicant to be edited
   const startEditingApplicant = (applicant) => {
     setEditingApplicant({ ...applicant });
   };
 
-  // Save edited applicant
+  // Save changes to an edited applicant
   const saveEditedApplicant = () => {
     if (!editingApplicant.name.trim()) return;
 
@@ -245,12 +269,12 @@ const App = () => {
     setEditingApplicant(null);
   };
 
-  // Cancel editing
+  // Cancel editing an applicant
   const cancelEditing = () => {
     setEditingApplicant(null);
   };
 
-  // Delete applicant
+  // Delete an applicant
   const deleteApplicant = (id) => {
     setApplicants((prev) => prev.filter((applicant) => applicant.id !== id));
     if (editingApplicant && editingApplicant.id === id) {
@@ -260,21 +284,53 @@ const App = () => {
 
   // Clear all applicants
   const clearAllApplicants = () => {
-    if (window.confirm("Are you sure you want to clear all applicants?")) {
-      setApplicants([]);
-      setEditingApplicant(null);
-      setMatches([]);
-      setUnmatched([]);
-    }
+    // Removed window.confirm as per instructions
+    setApplicants([]);
+    setEditingApplicant(null);
+    setMatches([]);
+    setUnmatched([]);
   };
 
-  // Clear generated schedule
+  // Clear generated schedule results
   const clearSchedule = () => {
     setMatches([]);
     setUnmatched([]);
   };
 
-  // Time utilities
+  // --- NEW: Clear ALL data (localStorage and state) ---
+  const clearAllData = () => {
+    localStorage.removeItem(STORAGE_KEYS.interviewer);
+    localStorage.removeItem(STORAGE_KEYS.applicants);
+
+    setInterviewerData({
+      availability: {
+        Monday: [],
+        Tuesday: [],
+        Wednesday: [],
+        Thursday: [],
+        Friday: [],
+      },
+    });
+    setApplicants([]);
+    setMatches([]);
+    setUnmatched([]);
+    setScheduleCapacity(1);
+    setScheduleDuration(15);
+    setEditingApplicant(null);
+    setCurrentApplicant({
+      name: "",
+      availability: {
+        Monday: [],
+        Tuesday: [],
+        Wednesday: [],
+        Thursday: [],
+        Friday: [],
+      },
+    });
+    setCurrentView("interviewer"); // Go back to interviewer setup
+  };
+
+  // Time conversion utilities
   const timeToMinutes = (timeStr) => {
     const [hours, minutes] = timeStr.split(":").map(Number);
     return hours * 60 + minutes;
@@ -288,7 +344,7 @@ const App = () => {
       .padStart(2, "0")}`;
   };
 
-  // Generate time slots from availability
+  // Generate interviewer time slots based on duration and capacity
   const generateTimeSlots = (
     capacity = scheduleCapacity,
     duration = scheduleDuration
@@ -310,7 +366,7 @@ const App = () => {
             daySlots.push({
               start: minutesToTime(slotStart),
               end: minutesToTime(slotEnd),
-              assigned: [],
+              assigned: [], // Tracks applicants assigned to this slot
             });
           }
         }
@@ -324,7 +380,7 @@ const App = () => {
     return slots;
   };
 
-  // Check if applicant is available for a slot
+  // Check if an applicant is available for a given time slot
   const isApplicantAvailable = (applicant, day, slotStart, slotEnd) => {
     const slotStartMinutes = timeToMinutes(slotStart);
     const slotEndMinutes = timeToMinutes(slotEnd);
@@ -337,26 +393,29 @@ const App = () => {
     });
   };
 
-  // Generate matches
+  // Main function to generate interview matches
   const generateMatches = (
     capacity = scheduleCapacity,
     duration = scheduleDuration
   ) => {
-    const timeSlots = generateTimeSlots(capacity, duration);
-    const shuffledApplicants = [...applicants].sort(() => Math.random() - 0.5);
-    const assignedApplicants = new Set();
+    const timeSlots = generateTimeSlots(capacity, duration); // Get all potential interviewer slots
+    const shuffledApplicants = [...applicants].sort(() => Math.random() - 0.5); // Randomize applicant order
+    const assignedApplicants = new Set(); // Keep track of assigned applicants
     const newUnmatched = [];
 
-    // Assign applicants to earliest available slots
+    // Attempt to assign each applicant to an available slot
     shuffledApplicants.forEach((applicant) => {
       let assigned = false;
 
+      // Iterate through days
       for (const dayData of timeSlots) {
-        if (assigned) break;
+        if (assigned) break; // Move to next applicant if assigned
 
+        // Iterate through slots within the day
         for (const slot of dayData.slots) {
-          if (assigned) break;
+          if (assigned) break; // Move to next applicant if assigned
 
+          // Check if slot has capacity and applicant is available
           if (
             slot.assigned.length < capacity &&
             isApplicantAvailable(applicant, dayData.day, slot.start, slot.end)
@@ -368,6 +427,7 @@ const App = () => {
         }
       }
 
+      // If applicant was not assigned, add to unmatched list
       if (!assigned) {
         newUnmatched.push(applicant);
       }
@@ -376,7 +436,7 @@ const App = () => {
     return { matches: timeSlots, unmatched: newUnmatched };
   };
 
-  // Handle capacity change and regenerate
+  // Handle schedule capacity change and regenerate schedule if needed
   const handleCapacityChange = (newCapacity) => {
     setScheduleCapacity(newCapacity);
     if (matches.length > 0 || unmatched.length > 0) {
@@ -389,7 +449,7 @@ const App = () => {
     }
   };
 
-  // Handle duration change and regenerate
+  // Handle schedule duration change and regenerate schedule if needed
   const handleDurationChange = (newDuration) => {
     setScheduleDuration(newDuration);
     if (matches.length > 0 || unmatched.length > 0) {
@@ -402,7 +462,7 @@ const App = () => {
     }
   };
 
-  // Generate initial matches
+  // Generate initial matches and switch to results view
   const initialGenerateMatches = () => {
     const { matches: newMatches, unmatched: newUnmatched } = generateMatches();
     setMatches(newMatches);
@@ -410,7 +470,7 @@ const App = () => {
     setCurrentView("results");
   };
 
-  // Format time for display
+  // Format time for display (e.g., "09:00" to "9:00 AM")
   const formatTime = (timeStr) => {
     const [hours, minutes] = timeStr.split(":").map(Number);
     if (hours === 12) return `12:${minutes.toString().padStart(2, "0")} PM`;
@@ -420,16 +480,24 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 p-4 font-sans">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
           <h1 className="text-4xl font-bold text-white mb-2">
             Interview Scheduler
           </h1>
           <p className="text-blue-200">
             Automatically match interviewer and applicant availability
           </p>
+          {/* NEW: Clear All Data Button */}
+          <button
+            onClick={clearAllData}
+            className="absolute top-0 right-0 flex items-center gap-1 px-3 py-2 text-sm bg-red-500/30 hover:bg-red-500/50 rounded-lg backdrop-blur-sm border border-red-400/30 text-red-100 transition-all"
+          >
+            <RefreshCcw size={16} />
+            Clear All Data
+          </button>
         </div>
 
         {/* Navigation */}
@@ -490,6 +558,8 @@ const App = () => {
         {currentView === "applicant" && (
           <div className="space-y-6">
             {/* Add/Edit Applicant Form */}
+            {/* NEW: CSV Import Component */}
+            <CsvImport onApplicantsImported={handleCsvImport} />
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                 <UserCheck size={24} />
